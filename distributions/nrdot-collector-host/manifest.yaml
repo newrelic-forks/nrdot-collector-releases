@@ -26,6 +26,7 @@ exporters:
   - gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter v0.141.0
 connectors:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/connector/routingconnector v0.141.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/connector/metricsaslogsconnector v0.141.0
 extensions:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.141.0
 providers:
