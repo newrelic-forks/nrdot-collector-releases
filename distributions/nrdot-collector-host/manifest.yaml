@@ -43,9 +43,9 @@ providers:
 
 # When adding a replace, add a comment before it to document why it's needed and when it can be removed
 replaces:
-# Replace with custom oracle receiver from spathlavath fork (commit 3e261bcdaa2ec03d87be8b61441babf18eb3e33a)
-  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/newrelicoraclereceiver => github.com/spathlavath/opentelemetry-collector-contrib/receiver/newrelicoraclereceiver 3e261bcdaa2ec03d87be8b61441babf18eb3e33a
-# Replace with custom sqlserver receiver from spathlavath fork (commit 3e261bcdaa2ec03d87be8b61441babf18eb3e33a)
-  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/newrelicsqlserverreceiver => github.com/spathlavath/opentelemetry-collector-contrib/receiver/newrelicsqlserverreceiver 3e261bcdaa2ec03d87be8b61441babf18eb3e33a
+# Replace with custom oracle receiver from spathlavath fork (commit 5ee1b7d741c80850ea6c5e81a2e3ef7b70d6c830)
+  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/newrelicoraclereceiver => github.com/spathlavath/opentelemetry-collector-contrib/receiver/newrelicoraclereceiver 5ee1b7d741c80850ea6c5e81a2e3ef7b70d6c830
+# Replace with custom sqlserver receiver from spathlavath fork (commit 5ee1b7d741c80850ea6c5e81a2e3ef7b70d6c830)
+  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/newrelicsqlserverreceiver => github.com/spathlavath/opentelemetry-collector-contrib/receiver/newrelicsqlserverreceiver 5ee1b7d741c80850ea6c5e81a2e3ef7b70d6c830
 
 ### Transitive deps determined via `go mod graph | grep $dep@$dep_replace_version`
