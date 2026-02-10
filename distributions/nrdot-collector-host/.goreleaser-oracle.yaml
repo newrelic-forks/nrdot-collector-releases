@@ -23,7 +23,7 @@ builds:
       - CGO_ENABLED=1
 archives:
   - id: nrdot-collector-host-oracle
-    ids:
+    builds:
       - nrdot-collector-host-oracle
     name_template: 'nrdot-collector-host-oracle_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
     files:
@@ -50,7 +50,7 @@ nfpms:
         dependencies:
           - /bin/sh
     id: nrdot-collector-host-oracle
-    ids:
+    builds:
       - nrdot-collector-host-oracle
     formats:
       - deb
