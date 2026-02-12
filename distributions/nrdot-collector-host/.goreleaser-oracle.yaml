@@ -26,8 +26,8 @@ builds:
       - goos: linux
         goarch: arm64
         env:
-          - CC=aarch64-linux-gnu-gcc
-          - CXX=aarch64-linux-gnu-g++
+          - CC=aarch64-none-linux-gnu-gcc
+          - CXX=aarch64-none-linux-gnu-g++
           - CGO_ENABLED=1
 archives:
   - id: nrdot-collector-host-oracle
