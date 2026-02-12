@@ -38,7 +38,11 @@ archives:
       - src: config.yaml
 nfpms:
   # Oracle-enabled packages (Linux AMD64 and ARM64 with CGO and cross-compilation support)
-  - file_name_template: 'nrdot-collector-host-oracle_{{ .Version }}_{{ .Os }}_{{- if not (eq (filter .ConventionalFileName "\\.rpm$") "") }}{{- replace .Arch "amd64" "x86_64" | replace "arm64" "aarch64" }}{{- else }}{{- .Arch }}{{- end }}'
+  - file_name_template: >-
+      {{ .PackageName }}_{{ .Version }}_{{ .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "arm64" }}aarch64
+      {{- else }}{{ .Arch }}{{ end }}
     package_name: nrdot-collector-host-oracle
     contents:
       - src: nrdot-collector-host.service
