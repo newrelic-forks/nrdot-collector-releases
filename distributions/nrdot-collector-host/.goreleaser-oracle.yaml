@@ -4,12 +4,13 @@ release:
   draft: true
   disable: true
 builds:
-  # Oracle-enabled build only - CGO enabled for Linux AMD64 (Oracle Instant Client support)
+  # Oracle-enabled build - CGO enabled for Linux AMD64 and ARM64 (Oracle Instant Client support)
   - id: nrdot-collector-host-oracle
     goos:
       - linux
     goarch:
       - amd64
+      - arm64
     dir: _build
     binary: nrdot-collector-host
     ldflags:
@@ -21,6 +22,13 @@ builds:
       - -buildmode=pie
     env:
       - CGO_ENABLED=1
+    overrides:
+      - goos: linux
+        goarch: arm64
+        env:
+          - CC=aarch64-none-linux-gnu-gcc
+          - CXX=aarch64-none-linux-gnu-g++
+          - CGO_ENABLED=1
 archives:
   - id: nrdot-collector-host-oracle
     builds:
@@ -29,8 +37,12 @@ archives:
     files:
       - src: config.yaml
 nfpms:
-  # Oracle-enabled packages (Linux AMD64 only with CGO)
-  - file_name_template: 'nrdot-collector-host-oracle_{{ .Version }}_{{ .Os }}_{{- if not (eq (filter .ConventionalFileName "\\.rpm$") "") }}{{- replace .Arch "amd64" "x86_64" }}{{- else }}{{- .Arch }}{{- end }}'
+  # Oracle-enabled packages (Linux AMD64 and ARM64 with CGO and cross-compilation support)
+  - file_name_template: >-
+      {{ .PackageName }}_{{ .Version }}_{{ .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "arm64" }}aarch64
+      {{- else }}{{ .Arch }}{{ end }}
     package_name: nrdot-collector-host-oracle
     contents:
       - src: nrdot-collector-host.service
