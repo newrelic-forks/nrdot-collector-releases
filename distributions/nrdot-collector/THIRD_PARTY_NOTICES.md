@@ -1,6 +1,6 @@
 # Third Party Notices
 
-The New Relic infrastructure agent uses source code from third party libraries which carry their own copyright notices
+New Relic Distributions of OpenTelemetry use source code from third party libraries which carry their own copyright notices
 and license terms. These notices are provided below.
 
 In the event that a required notice is missing or incorrect, please notify us by e-mailing
@@ -9,6 +9,14 @@ In the event that a required notice is missing or incorrect, please notify us by
 For any licenses that require the disclosure of source code, the source code
 can be found at https://github.com/newrelic/nrdot-collector-releases.
 
+
+
+
+## [github.com/newrelic/nrdot-collector-components/processor/adaptivetelemetryprocessor](https://github.com/newrelic/nrdot-collector-components)
+
+Distributed under the following license(s):
+
+* Apache-2.0
 
 
 
@@ -29,6 +37,30 @@ Distributed under the following license(s):
 
 
 ## [github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension](https://github.com/open-telemetry/opentelemetry-collector-contrib)
+
+Distributed under the following license(s):
+
+* Apache-2.0
+
+
+
+## [github.com/open-telemetry/opentelemetry-collector-contrib/extension/observer/dockerobserver](https://github.com/open-telemetry/opentelemetry-collector-contrib)
+
+Distributed under the following license(s):
+
+* Apache-2.0
+
+
+
+## [github.com/open-telemetry/opentelemetry-collector-contrib/extension/observer/hostobserver](https://github.com/open-telemetry/opentelemetry-collector-contrib)
+
+Distributed under the following license(s):
+
+* Apache-2.0
+
+
+
+## [github.com/open-telemetry/opentelemetry-collector-contrib/extension/observer/k8sobserver](https://github.com/open-telemetry/opentelemetry-collector-contrib)
 
 Distributed under the following license(s):
 
@@ -61,6 +93,22 @@ Distributed under the following license(s):
 
 
 ## [github.com/open-telemetry/opentelemetry-collector-contrib/processor/groupbyattrsprocessor](https://github.com/open-telemetry/opentelemetry-collector-contrib)
+
+Distributed under the following license(s):
+
+* Apache-2.0
+
+
+
+## [github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8sattributesprocessor](https://github.com/open-telemetry/opentelemetry-collector-contrib)
+
+Distributed under the following license(s):
+
+* Apache-2.0
+
+
+
+## [github.com/open-telemetry/opentelemetry-collector-contrib/processor/metricsgenerationprocessor](https://github.com/open-telemetry/opentelemetry-collector-contrib)
 
 Distributed under the following license(s):
 
@@ -116,6 +164,22 @@ Distributed under the following license(s):
 
 
 
+## [github.com/open-telemetry/opentelemetry-collector-contrib/receiver/dockerstatsreceiver](https://github.com/open-telemetry/opentelemetry-collector-contrib)
+
+Distributed under the following license(s):
+
+* Apache-2.0
+
+
+
+## [github.com/open-telemetry/opentelemetry-collector-contrib/receiver/elasticsearchreceiver](https://github.com/open-telemetry/opentelemetry-collector-contrib)
+
+Distributed under the following license(s):
+
+* Apache-2.0
+
+
+
 ## [github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver](https://github.com/open-telemetry/opentelemetry-collector-contrib)
 
 Distributed under the following license(s):
@@ -132,7 +196,63 @@ Distributed under the following license(s):
 
 
 
+## [github.com/open-telemetry/opentelemetry-collector-contrib/receiver/jmxreceiver](https://github.com/open-telemetry/opentelemetry-collector-contrib)
+
+Distributed under the following license(s):
+
+* Apache-2.0
+
+
+
+## [github.com/open-telemetry/opentelemetry-collector-contrib/receiver/k8seventsreceiver](https://github.com/open-telemetry/opentelemetry-collector-contrib)
+
+Distributed under the following license(s):
+
+* Apache-2.0
+
+
+
+## [github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kafkametricsreceiver](https://github.com/open-telemetry/opentelemetry-collector-contrib)
+
+Distributed under the following license(s):
+
+* Apache-2.0
+
+
+
+## [github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kubeletstatsreceiver](https://github.com/open-telemetry/opentelemetry-collector-contrib)
+
+Distributed under the following license(s):
+
+* Apache-2.0
+
+
+
+## [github.com/open-telemetry/opentelemetry-collector-contrib/receiver/nginxreceiver](https://github.com/open-telemetry/opentelemetry-collector-contrib)
+
+Distributed under the following license(s):
+
+* Apache-2.0
+
+
+
 ## [github.com/open-telemetry/opentelemetry-collector-contrib/receiver/prometheusreceiver](https://github.com/open-telemetry/opentelemetry-collector-contrib)
+
+Distributed under the following license(s):
+
+* Apache-2.0
+
+
+
+## [github.com/open-telemetry/opentelemetry-collector-contrib/receiver/rabbitmqreceiver](https://github.com/open-telemetry/opentelemetry-collector-contrib)
+
+Distributed under the following license(s):
+
+* Apache-2.0
+
+
+
+## [github.com/open-telemetry/opentelemetry-collector-contrib/receiver/receivercreator](https://github.com/open-telemetry/opentelemetry-collector-contrib)
 
 Distributed under the following license(s):
 

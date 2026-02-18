@@ -4,6 +4,7 @@ This README covers topics that apply to all distributions. For distribution-spec
 - [nrdot-collector-host](./nrdot-collector-host/README.md)
 - [nrdot-collector-k8s](./nrdot-collector-k8s/README.md)
 - [nrdot-collector](./nrdot-collector/README.md)
+- [nrdot-collector-experimental](./nrdot-collector-experimental/README.md)
 
 We also provide [FIPS-compliant docker images](../fips/README.md).
 
@@ -81,7 +82,7 @@ If a distribution provides linux packages (refer to its README), you can follow 
 ##### DEB Installation
 ```bash
 export collector_distro="nrdot-collector-host"
-export collector_version="1.6.0"
+export collector_version="1.11.0"
 export collector_arch="amd64" # or arm64
 export license_key="YOUR_LICENSE_KEY"
 
@@ -94,7 +95,7 @@ sudo systemctl reload-or-restart "${collector_distro}.service"
 ### RPM Installation
 ```bash
 export collector_distro="nrdot-collector-host"
-export collector_version="1.6.0"
+export collector_version="1.11.0"
 export collector_arch="x86_64" # or arm64
 export license_key="YOUR_LICENSE_KEY"
 
@@ -108,7 +109,7 @@ sudo systemctl reload-or-restart "${collector_distro}.service"
 Archives contain the binary and the default configuration which is usually `config.yaml` unless the distro packages multiple defaults, e.g. `nrdot-collector-k8s`.
 ```bash
 export collector_distro="nrdot-collector-host"
-export collector_version="1.6.0"
+export collector_version="1.11.0"
 export collector_arch="amd64" # or arm64
 export license_key="YOUR_LICENSE_KEY"
 curl "https://github.com/newrelic/nrdot-collector-releases/releases/download/${collector_version}/${collector_distro}_${collector_version}_linux_${collector_arch}.tar.gz" --location --output collector.tar.gz
@@ -130,6 +131,23 @@ If the distribution provides a default configuration, some options are exposed v
 ### Advanced: Using your own collector configuration
 
 We recommend using the default configuration, but you can always supply your own via the `--config` [flag](https://opentelemetry.io/docs/collector/configuration/). The full list of components available for configuration is available in the respective `manifest.yaml`.
+
+### Security Best Practices
+
+This section summarizes security practices we deem the most crucial. For comprehensive security guidance, refer to the [Collector configuration best practices](https://opentelemetry.io/docs/security/config-best-practices/).
+
+#### Minimize Privileged Access
+
+The collector should run as a non-root user whenever possible. If a use-case requires elevated privileges or RBAC, this will be documented in its installation instructions.
+
+#### Store secrets securely
+Store secrets like API keys or certificates in a dedicated secret store and avoid hardcoding secrets in your config and instead prefer [environment variable expansion](https://opentelemetry.io/docs/collector/configuration/#environment-variables).
+
+#### Secure connections
+Receivers and Exporters should always be configured to use a secure and authenticated connection. In practical terms this means
+- using TLS for outgoing and incoming (requires [setting up certificates](https://opentelemetry.io/docs/collector/configuration/#setting-up-certificates)) connections
+- require authentication for backends the collector writes to, e.g. via an API Key
+- bind receivers to specific network interfaces, such as a pod’s IP, or `localhost` instead of `0.0.0.0` ([#1](https://opentelemetry.io/docs/security/config-best-practices/#protect-against-denial-of-service-attacks), [#2](https://cwe.mitre.org/data/definitions/1327.html)) to prevent exposing unintended access
 
 ## Additional Notes
 

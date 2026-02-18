@@ -12,11 +12,6 @@ variable "test_environment" {
   description = "Name of test environment to distinguish entities"
 }
 
-variable "deploy_id" {
-  type        = string
-  description = "An id to uniquely identify a deployment to an environment, e.g. for change tracking"
-}
-
 variable "vpc_id" {
   description = "The ID of the VPC where the instance will be deployed to (in one of the private subnets)"
   type        = string
@@ -33,8 +28,17 @@ variable "collector_distro" {
   type        = string
 }
 
-variable "collector_version" {
+variable "nrdot_version" {
   description = "Version of NRDOT to install"
   type        = string
-  default     = "nightly"
+}
+
+variable "commit_sha_short" {
+  description = "Short commit SHA (7 chars) for S3 artifact path"
+  type        = string
+}
+
+variable "test_key" {
+  description = "Test key for scoping queries"
+  type        = string
 }

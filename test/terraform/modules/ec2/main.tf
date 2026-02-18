@@ -1,18 +1,16 @@
 locals {
-  collector_reported_hostname_prefix = "${var.test_environment}-${var.deploy_id}-${var.collector_distro}"
   instance_config = [
     {
-      hostname_suffix    = "ec2_ubuntu22_04-0"
+      test_key_prefix    = "ec2_ubuntu22_04-0"
       release_verion     = "22.04"
       release_short_name = "jammy"
     },
     {
-      hostname_suffix    = "ec2_ubuntu24_04-0"
+      test_key_prefix    = "ec2_ubuntu24_04-0"
       release_verion     = "24.04"
       release_short_name = "noble"
     },
   ]
-  collector_version_specifier = "${var.collector_version == "" ? "" : "="}${var.collector_version}"
 }
 
 data "aws_ami" "ubuntu_ami" {
@@ -117,7 +115,7 @@ resource "aws_instance" "ubuntu" {
   iam_instance_profile   = aws_iam_instance_profile.s3_read_access.name
 
   tags = {
-      Name = "${var.test_environment}-${var.collector_distro}-${local.instance_config[count.index].hostname_suffix}"
+      Name = "${var.test_environment}-${var.collector_distro}-${local.instance_config[count.index].test_key_prefix}"
   }
   
   user_data_replace_on_change = true
@@ -131,15 +129,18 @@ resource "aws_instance" "ubuntu" {
               curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
               unzip -q awscliv2.zip
               ./aws/install
-              deb_package_basepath='s3://${var.releases_bucket_name}/nrdot-collector-releases/${var.collector_distro}/${var.collector_version}/'
+              deb_package_basepath='s3://${var.releases_bucket_name}/nrdot-collector-releases/${var.collector_distro}/${var.nrdot_version}/${var.commit_sha_short}/'
               latest_deb_package_filename=$(aws s3 ls $${deb_package_basepath} | sort -r | grep '${var.collector_distro}' | grep 'amd64.deb$' | head -n1 | awk '{print $NF}')
               echo "Installing collector from: $${deb_package_basepath}$${latest_deb_package_filename}"
               aws s3 cp "$${deb_package_basepath}$${latest_deb_package_filename}" /tmp/collector.deb
+              export NRDOT_MODE=ROOT
               dpkg -i /tmp/collector.deb
               ################################################
               echo 'Configuring Collector'
               echo 'NEW_RELIC_LICENSE_KEY=${var.nr_ingest_key}' >> /etc/${var.collector_distro}/${var.collector_distro}.conf
-              echo "OTEL_RESOURCE_ATTRIBUTES='testKey=${local.collector_reported_hostname_prefix}-${local.instance_config[count.index].hostname_suffix}'" >> /etc/${var.collector_distro}/${var.collector_distro}.conf
+              echo "OTEL_RESOURCE_ATTRIBUTES='testKey=${var.test_key}'" >> /etc/${var.collector_distro}/${var.collector_distro}.conf
               systemctl reload-or-restart ${var.collector_distro}.service
+              sleep 30
+              journalctl | grep ${var.collector_distro}
               EOF
 }

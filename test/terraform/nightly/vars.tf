@@ -14,6 +14,16 @@ variable "distro" {
   type        = string
 }
 
+variable "nrdot_version" {
+  description = "Version of NRDOT to test during nightly"
+  type        = string
+}
+
+variable "commit_sha_short" {
+  description = "Short commit SHA (7 chars) for S3 artifact path"
+  type        = string
+}
+
 variable "nr_backend_url" {
   type        = string
   description = "NR endpoint used in test cluster"
@@ -26,10 +36,9 @@ variable "nr_ingest_key" {
   sensitive   = true
 }
 
-variable "test_environment" {
+variable "test_env_prefix" {
   type        = string
-  description = "Name of test environment to distinguish entities"
-  default     = "nightly"
+  description = "Prefix of test environment to distinguish entities"
 }
 
 variable "fips"  {
@@ -38,13 +47,13 @@ variable "fips"  {
   default     = false
 }
 
-variable "k8s_namespace_prefix" {
-  type        = string
-  description = "K8s namespace to deploy to"
-  default     = "nightly"
-}
-
 variable "image_tag" {
   description = "Tag of the nightly docker image"
   type        = string
+}
+
+variable "test_key" {
+  description = "Test key for scoping queries (used by action-based tests, Go tests use generated pattern)"
+  type        = string
+  default     = ""
 }

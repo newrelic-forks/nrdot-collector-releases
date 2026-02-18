@@ -3,7 +3,7 @@ GORELEASER ?= goreleaser
 
 # SRC_ROOT is the top of the source tree.
 SRC_ROOT := $(shell git rev-parse --show-toplevel)
-OTELCOL_BUILDER_VERSION ?= 0.141.0
+OTELCOL_BUILDER_VERSION ?= 0.142.0
 OTELCOL_BUILDER_DIR ?= ${HOME}/bin
 OTELCOL_BUILDER ?= ${OTELCOL_BUILDER_DIR}/ocb
 
@@ -15,10 +15,11 @@ TOOLS_PKG_NAMES := $(shell grep -E $(TOOLS_MOD_REGEX) < $(TOOLS_MOD_DIR)/tools.g
 TOOLS_BIN_NAMES := $(addprefix $(TOOLS_BIN_DIR)/, $(notdir $(shell echo $(TOOLS_PKG_NAMES))))
 GO_LICENCE_DETECTOR        := $(TOOLS_BIN_DIR)/go-licence-detector
 GO_LICENCE_DETECTOR_CONFIG   := $(SRC_ROOT)/internal/assets/license/rules.json
+NRLICENSE := $(TOOLS_BIN_DIR)/nrlicense
 
 DISTRIBUTIONS ?= "nrdot-collector-host,nrdot-collector-k8s,nrdot-collector,nrdot-collector-experimental"
 
-ci: check build build-fips version-check licenses-check
+ci: check manifests-check build build-fips version-check licenses-check
 check: ensure-goreleaser-up-to-date
 
 build: go ocb
@@ -39,7 +40,7 @@ goreleaser-verify: goreleaser
 	@${GORELEASER} release --snapshot --clean
 
 ensure-goreleaser-up-to-date: generate-goreleaser
-	@git diff -s --exit-code distributions/*/.goreleaser.yaml || (echo "Check failed: The goreleaser templates have changed but the .goreleaser.yamls haven't. Run 'make generate-goreleaser' and update your PR." && exit 1)
+	@git diff -s --exit-code distributions/*/.goreleaser*.yaml || (echo "Check failed: The goreleaser templates have changed but the .goreleaser.yamls haven't. Run 'make generate-goreleaser' and update your PR." && exit 1)
 
 validate-components:
 	@./scripts/validate-components.sh
@@ -145,15 +146,25 @@ $(TOOLS_BIN_DIR):
 $(TOOLS_BIN_NAMES): $(TOOLS_BIN_DIR) $(TOOLS_MOD_DIR)/go.mod
 	cd $(TOOLS_MOD_DIR) && $(GOCMD) build -o $@ -trimpath $(filter %/$(notdir $@),$(TOOLS_PKG_NAMES))
 
-FILENAME?=$(shell git branch --show-current)
+# Exclude files we adopted from upstream which would be overwritten were they not excluded.
+HEADER_GEN_FILES=$(shell find $(SRC_ROOT)/. \
+	-type f \( -name '*.go' -o -name '*.js' -o -name '*.sh' \) \
+	! -name 'preinstall.sh' ! -name 'postinstall.sh' ! -name 'preremove.sh' \
+	! -name 'free-disk-space.sh')
 NOTICE_OUTPUT?=THIRD_PARTY_NOTICES.md
+FIRST_COMMIT_HASH=6451f322bfe1e62962d3d87b50d785de8048e865
 
 .PHONY: licenses
-licenses: go generate-sources $(GO_LICENCE_DETECTOR)
+licenses: go generate-sources $(GO_LICENCE_DETECTOR) $(NRLICENSE)
 	@./scripts/licenses.sh -d "${DISTRIBUTIONS}" -b ${GO_LICENCE_DETECTOR} -n ${NOTICE_OUTPUT} -g ${GO}
+	@$(NRLICENSE) --fix --fork-commit ${FIRST_COMMIT_HASH} ${HEADER_GEN_FILES}
+
+.PHONY: headers-check
+headers-check: $(NRLICENSE)
+	@$(NRLICENSE) --check --fork-commit ${FIRST_COMMIT_HASH} ${HEADER_GEN_FILES}
 
 .PHONY: licenses-check
-licenses-check: licenses
+licenses-check: headers-check licenses
 	@git diff --name-only | grep -q $(NOTICE_OUTPUT) \
 		&& { \
 			echo "Third party notices out of date, please run \"make licenses\" and commit the changes in this PR.";\
@@ -162,3 +173,16 @@ licenses-check: licenses
 			exit 1;\
 		} \
 		|| exit 0
+
+# Check if all core components are present in experimental manifest
+CORE_MANIFEST="${SRC_ROOT}/distributions/nrdot-collector/manifest.yaml"
+EXPERIMENTAL_MANIFEST="${SRC_ROOT}/distributions/nrdot-collector-experimental/manifest.yaml"
+.PHONY: manifests-check
+manifests-check:
+	@diff=$$(yq 'del(.dist)' "${CORE_MANIFEST}" | \
+	grep -vxF "$$(yq 'del(.dist)' "${EXPERIMENTAL_MANIFEST}")"); \
+	[ -n "$${diff}" ] && { \
+		echo "NRDOT Experimental manifest out of sync with Core. Diff:"; \
+		echo "$${diff}"; \
+		exit 1; \
+	} || exit 0
