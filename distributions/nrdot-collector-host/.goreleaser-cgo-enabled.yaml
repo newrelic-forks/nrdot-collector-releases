@@ -5,7 +5,7 @@ release:
   disable: true
 builds:
   # Oracle-enabled build - CGO enabled for Linux AMD64 and ARM64 (Oracle Instant Client support)
-  - id: nrdot-collector-host-oracle
+  - id: nrdot-collector-host
     goos:
       - linux
     goarch:
@@ -30,10 +30,10 @@ builds:
           - CXX=aarch64-none-linux-gnu-g++
           - CGO_ENABLED=1
 archives:
-  - id: nrdot-collector-host-oracle
+  - id: nrdot-collector-host
     builds:
-      - nrdot-collector-host-oracle
-    name_template: 'nrdot-collector-host-oracle_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+      - nrdot-collector-host
+    name_template: 'nrdot-collector-host_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
     files:
       - src: config.yaml
 nfpms:
@@ -43,7 +43,7 @@ nfpms:
       {{- if eq .Arch "amd64" }}x86_64
       {{- else if eq .Arch "arm64" }}aarch64
       {{- else }}{{ .Arch }}{{ end }}
-    package_name: nrdot-collector-host-oracle
+    package_name: nrdot-collector-host
     contents:
       - src: nrdot-collector-host.service
         dst: /lib/systemd/system/nrdot-collector-host.service
@@ -61,9 +61,9 @@ nfpms:
       rpm:
         dependencies:
           - /bin/sh
-    id: nrdot-collector-host-oracle
+    id: nrdot-collector-host
     builds:
-      - nrdot-collector-host-oracle
+      - nrdot-collector-host
     formats:
       - deb
       - rpm
