@@ -1,0 +1,56 @@
+version: 2
+project_name: nrdot-collector-releases
+release:
+  draft: true
+  disable: true
+builds:
+  # Windows AMD64 build with CGO enabled for SQL Server support
+  - id: nrdot-collector-host
+    goos:
+      - windows
+    goarch:
+      - amd64
+    dir: distributions/nrdot-collector-host/_build
+    binary: nrdot-collector-host
+    ldflags:
+      - -s
+      - -w
+    flags:
+      - -trimpath
+    env:
+      - CGO_ENABLED=1
+      - CC=x86_64-w64-mingw32-gcc
+      - CXX=x86_64-w64-mingw32-g++
+archives:
+  - id: nrdot-collector-host
+    builds:
+      - nrdot-collector-host
+    name_template: 'nrdot-collector-host_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    format: zip
+    files:
+      - src: distributions/nrdot-collector-host/config.yaml
+        dst: config.yaml
+        strip_parent: true
+nfpms:
+  - file_name_template: 'nrdot-collector-host_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    package_name: nrdot-collector-host
+    vendor: New Relic
+    homepage: https://newrelic.com
+    maintainer: New Relic <otelcomm-team@newrelic.com>
+    description: NRDOT Collector - nrdot-collector-host (with Oracle Instant Client and SQL Server support via CGO)
+    license: Apache 2.0
+    formats:
+      - msi
+    contents:
+      - src: distributions/nrdot-collector-host/config.yaml
+        dst: config.yaml
+    msi:
+      wxs: distributions/nrdot-collector-host/nrdot-collector-host.wxs
+snapshot:
+  version_template: '{{ incpatch .Version }}-SNAPSHOT-{{.ShortCommit}}'
+checksum:
+  name_template: '{{ .ArtifactName }}.sum'
+  algorithm: sha256
+  split: true
+changelog:
+  disable: true

@@ -15,6 +15,7 @@ processors:
   - gomod: go.opentelemetry.io/collector/processor/memorylimiterprocessor v0.142.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.142.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/cumulativetodeltaprocessor v0.142.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/deltatorateprocessor v0.142.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/filterprocessor v0.142.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/metricstransformprocessor v0.142.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcedetectionprocessor v0.142.0
@@ -49,5 +50,5 @@ replaces:
   - github.com/expr-lang/expr v1.17.6 => github.com/expr-lang/expr v1.17.7
   # Replace with custom oracle receiver from fork (commit 63a57812ebd59cbcac19d325064ed734ae2f1795)
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/newrelicoraclereceiver => github.com/newrelic-forks/nrdot-collector-components/receiver/newrelicoraclereceiver 63a57812ebd59cbcac19d325064ed734ae2f1795
-  # Replace with custom sqlserver receiver from fork (commit 5e78932d9c176ddaa091189bc373ae6d19c64ff1)
-  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/newrelicsqlserverreceiver => github.com/newrelic-forks/nrdot-collector-components/receiver/newrelicsqlserverreceiver 5e78932d9c176ddaa091189bc373ae6d19c64ff1
+  # Replace with custom sqlserver receiver from fork (commit 3e1480d5f898d59702fca85ecb87b83884848f9d)
+  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/newrelicsqlserverreceiver => github.com/newrelic-forks/nrdot-collector-components/receiver/newrelicsqlserverreceiver 3e1480d5f898d59702fca85ecb87b83884848f9d

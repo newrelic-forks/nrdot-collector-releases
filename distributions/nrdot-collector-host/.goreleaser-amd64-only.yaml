@@ -4,13 +4,12 @@ release:
   draft: true
   disable: true
 builds:
-  # Oracle-enabled build - CGO enabled for Linux AMD64 and ARM64 (Oracle Instant Client support)
+  # Oracle-enabled build - CGO enabled for Linux AMD64 only
   - id: nrdot-collector-host
     goos:
       - linux
     goarch:
       - amd64
-      - arm64
     dir: distributions/nrdot-collector-host/_build
     binary: nrdot-collector-host
     ldflags:
@@ -20,41 +19,35 @@ builds:
       - -trimpath
     env:
       - CGO_ENABLED=1
-    overrides:
-      - goos: linux
-        goarch: arm64
-        env:
-          - CC=aarch64-linux-gnu-gcc
-          - CXX=aarch64-linux-gnu-g++
-          - CGO_ENABLED=1
 archives:
   - id: nrdot-collector-host
     builds:
       - nrdot-collector-host
     name_template: 'nrdot-collector-host_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
     files:
-      - src: config.yaml
+      - src: distributions/nrdot-collector-host/config.yaml
+        dst: config.yaml
+        strip_parent: true
 nfpms:
-  # Oracle-enabled packages (Linux AMD64 and ARM64 with CGO and cross-compilation support)
+  # Oracle-enabled packages (Linux AMD64 with CGO support)
   - file_name_template: >-
       {{ .PackageName }}_{{ .Version }}_{{ .Os }}_
       {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "arm64" }}aarch64
       {{- else }}{{ .Arch }}{{ end }}
     package_name: nrdot-collector-host
     contents:
-      - src: nrdot-collector-host.service
+      - src: distributions/nrdot-collector-host/nrdot-collector-host.service
         dst: /lib/systemd/system/nrdot-collector-host.service
-      - src: nrdot-collector-host.conf
+      - src: distributions/nrdot-collector-host/nrdot-collector-host.conf
         dst: /etc/nrdot-collector-host/nrdot-collector-host.conf
         type: config|noreplace
-      - src: config.yaml
+      - src: distributions/nrdot-collector-host/config.yaml
         dst: /etc/nrdot-collector-host/config.yaml
         type: config
     scripts:
-      preinstall: preinstall.sh
-      postinstall: postinstall.sh
-      preremove: preremove.sh
+      preinstall: distributions/nrdot-collector-host/preinstall.sh
+      postinstall: distributions/nrdot-collector-host/postinstall.sh
+      preremove: distributions/nrdot-collector-host/preremove.sh
     overrides:
       rpm:
         dependencies:
@@ -66,7 +59,7 @@ nfpms:
       - deb
       - rpm
     maintainer: New Relic <otelcomm-team@newrelic.com>
-    description: NRDOT Collector - nrdot-collector-host (with Oracle Instant Client support via CGO)
+    description: NRDOT Collector - nrdot-collector-host (with Oracle Instant Client and SQL Server support via CGO)
     license: Apache 2.0
 snapshot:
   version_template: '{{ incpatch .Version }}-SNAPSHOT-{{.ShortCommit}}'

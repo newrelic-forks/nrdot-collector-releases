@@ -11,21 +11,23 @@ builds:
     goarch:
       - amd64
       - arm64
-    dir: distributions/nrdot-collector-host/_build
+    dir: _build
     binary: nrdot-collector-host
     ldflags:
       - -s
       - -w
+      - -linkmode=external
     flags:
       - -trimpath
+      - -buildmode=pie
     env:
       - CGO_ENABLED=1
     overrides:
       - goos: linux
         goarch: arm64
         env:
-          - CC=aarch64-linux-gnu-gcc
-          - CXX=aarch64-linux-gnu-g++
+          - CC=aarch64-none-linux-gnu-gcc
+          - CXX=aarch64-none-linux-gnu-g++
           - CGO_ENABLED=1
 archives:
   - id: nrdot-collector-host

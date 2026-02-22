@@ -1,0 +1,7 @@
+Skipping the compilation, we'll only generate the sources.
+Distributions to build: nrdot-collector-host
+Building: nrdot-collector-host
+Using Builder: /Users/pkulkarni/bin/ocb
+Using Go: /Users/pkulkarni/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.24.11.darwin-arm64/bin/go
+Using FIPS: false
+✅ SUCCESS: distribution 'nrdot-collector-host' built.

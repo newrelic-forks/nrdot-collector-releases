@@ -14,6 +14,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+echo ""
+echo "=========================================================================="
+echo "NRDOT Collector Host installed successfully!"
+echo "=========================================================================="
+echo ""
+echo "Current configuration: DEFAULT (host metrics + logs)"
+echo ""
+echo "To monitor databases, switch configuration:"
+echo "  SQL Server:  sudo cp /etc/nrdot-collector-host/config-sqlserver.yaml /etc/nrdot-collector-host/config.yaml"
+echo "  Oracle:      sudo cp /etc/nrdot-collector-host/config-oracle.yaml /etc/nrdot-collector-host/config.yaml"
+echo "  Both DBs:    sudo cp /etc/nrdot-collector-host/config-combined.yaml /etc/nrdot-collector-host/config.yaml"
+echo ""
+echo "After switching configurations:"
+echo "  sudo systemctl restart nrdot-collector-host"
+echo ""
+echo "Configure database credentials using environment variables in:"
+echo "  /etc/nrdot-collector-host/nrdot-collector-host.conf"
+echo ""
+echo "=========================================================================="
+echo ""
+
 if command -v systemctl >/dev/null 2>&1; then
     if [ "${NRDOT_MODE}" = "ROOT" ]; then
         sed -i "/User=nrdot-collector-host/d" /lib/systemd/system/nrdot-collector-host.service

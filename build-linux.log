@@ -1,0 +1,22 @@
+  • skipping announce, publish, and validate...
+  • cleaning distribution directory
+  • loading environment variables
+  • getting and validating git state
+    • git state                                      commit=c403bb8a967a8576050f2d171ec37e807583c717 branch=feature/sqlserver-oracle-receivers current_tag=1.11.0 previous_tag=1.10.0 dirty=true
+    • pipe skipped or partially skipped              reason=disabled during snapshot mode
+  • parsing tag
+  • setting defaults
+    • pipe skipped or partially skipped              reason=release is disabled
+    • DEPRECATED: archives.builds should not be used anymore, check https://goreleaser.com/deprecations#archivesbuilds for more info
+    • DEPRECATED: nfpms.builds should not be used anymore, check https://goreleaser.com/deprecations#nfpmsbuilds for more info
+  • snapshotting
+    • building snapshot...                           version=1.11.1-SNAPSHOT-c403bb8
+  • ensuring distribution directory
+  • setting up metadata
+  • writing release metadata
+  • loading go mod information
+  • build prerequisites
+  • building binaries
+    • building                                       binary=dist/nrdot-collector-host_linux_arm64_v8.0/nrdot-collector-host
+    • building                                       binary=dist/nrdot-collector-host_linux_amd64_v1/nrdot-collector-host
+  ⨯ release failed after 0s                          error=build failed: couldn't find main file: stat _build: no such file or directory target=linux_arm64_v8.0

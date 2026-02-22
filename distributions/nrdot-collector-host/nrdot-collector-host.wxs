@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product
+    Id="*"
+    Name="NRDOT Collector Host"
+    Language="1033"
+    Version="{{.Version}}"
+    Manufacturer="New Relic"
+    UpgradeCode="12345678-1234-1234-1234-123456789012">
+
+    <Package
+      InstallerVersion="200"
+      Compressed="yes"
+      InstallScope="perMachine"
+      Description="NRDOT Collector Host with Oracle and SQL Server support"
+      Comments="Built with CGO enabled for database receiver support" />
+
+    <MajorUpgrade
+      DowngradeErrorMessage="A newer version of [ProductName] is already installed."
+      AllowSameVersionUpgrades="yes" />
+
+    <MediaTemplate EmbedCab="yes" />
+
+    <Feature Id="ProductFeature" Title="NRDOT Collector Host" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFiles64Folder">
+        <Directory Id="INSTALLFOLDER" Name="NRDOT Collector Host">
+          <Directory Id="BinFolder" Name="bin" />
+          <Directory Id="ConfigFolder" Name="config" />
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <Component Id="MainExecutable" Guid="*">
+        <File
+          Id="nrdotcollectorhostEXE"
+          Source="nrdot-collector-host.exe"
+          KeyPath="yes"
+          Checksum="yes" />
+      </Component>
+      <Component Id="ConfigFile" Guid="*" Directory="ConfigFolder">
+        <File
+          Id="configYAML"
+          Source="config.yaml"
+          KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+
+    <UI>
+      <UIRef Id="WixUI_InstallDir" />
+    </UI>
+
+  </Product>
+</Wix>
