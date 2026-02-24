@@ -47,7 +47,7 @@ replaces:
   # Why: Fixes CVE-2025-68156
   # Transitive dep of various components and packages
   - github.com/expr-lang/expr v1.17.6 => github.com/expr-lang/expr v1.17.7
-  # Replace with custom oracle receiver from fork (commit 064227f5230d1bb2e7a4e6aa285981a6bc3648f7)
-  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/newrelicoraclereceiver => github.com/newrelic-forks/nrdot-collector-components/receiver/newrelicoraclereceiver 064227f5230d1bb2e7a4e6aa285981a6bc3648f7
+  # Replace with custom oracle receiver from fork (commit 3052e83a7b08b46023d1972848af2b80bc535341)
+  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/newrelicoraclereceiver => github.com/newrelic-forks/nrdot-collector-components/receiver/newrelicoraclereceiver 3052e83a7b08b46023d1972848af2b80bc535341
   # Replace with custom sqlserver receiver from fork (commit 5e78932d9c176ddaa091189bc373ae6d19c64ff1)
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/newrelicsqlserverreceiver => github.com/newrelic-forks/nrdot-collector-components/receiver/newrelicsqlserverreceiver 5e78932d9c176ddaa091189bc373ae6d19c64ff1
