@@ -36,6 +36,7 @@ archives:
     name_template: 'nrdot-collector-host-oracle_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
     files:
       - src: config.yaml
+      - src: configurations/oracle-config.yml.sample
 nfpms:
   # Oracle-enabled packages (Linux AMD64 and ARM64 with CGO and cross-compilation support)
   - file_name_template: >-
@@ -52,6 +53,9 @@ nfpms:
         type: config|noreplace
       - src: config.yaml
         dst: /etc/nrdot-collector-host/config.yaml
+        type: config
+      - src: configurations/oracle-config.yml.sample
+        dst: /etc/nrdot-collector-host/oracle-config.yml.sample
         type: config
     scripts:
       preinstall: preinstall.sh

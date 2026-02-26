@@ -1,0 +1,117 @@
+receivers:
+  newrelicoracledb/cdb:
+    endpoint: ""
+    username: ""
+    password: ""
+    service: ""
+    collection_interval: 45s
+    timeout: 45s
+    # enable_tablespace_scraper: true
+    # enable_core_scraper: true
+    # enable_system_scraper: true
+    # enable_connection_scraper: true
+    # enable_container_scraper: true
+    # enable_database_info_scraper: true
+
+  newrelicoracledb/pdb:
+    endpoint: ""
+    username: ""
+    password: ""
+    service: ""
+    collection_interval: 45s
+    query_monitoring_response_time_threshold: 0
+    query_monitoring_count_threshold: 49
+    timeout: 45s
+    pdb_services: ["ALL"]
+    # enable_query_monitoring: true
+    # enable_session_scraper: true
+    # enable_pdb_scraper: true
+
+processors:
+  # Oracle-specific: Used to prevent out of memory situations on the Oracle collector
+  memory_limiter/oracle:
+    check_interval: 1s
+    limit_mib: ${env:NEW_RELIC_MEMORY_LIMIT_MIB:-100}
+
+  # Oracle-specific: Convert cumulative Oracle connection metrics to delta
+  cumulativetodelta/oracle:
+    include:
+      match_type: strict
+      metrics:
+        - newrelicoracledb.connection.bytes_received
+        - newrelicoracledb.connection.bytes_sent
+        - newrelicoracledb.connection.execute_count
+        - newrelicoracledb.connection.logons_cumulative
+        - newrelicoracledb.connection.parse_count_hard
+        - newrelicoracledb.connection.parse_count_total
+        - newrelicoracledb.connection.sqlnet_roundtrips
+        - newrelicoracledb.connection.user_commits
+        - newrelicoracledb.connection.user_rollbacks
+
+  # Oracle-specific: Transform to clear description and unit fields from Oracle metrics
+  transform/oracle_clear_metadata:
+    metric_statements:
+      - context: metric
+        statements:
+          - set(metric.description, "")
+          - set(metric.unit, "")
+    log_statements:
+      - context: log
+        statements:
+          - set(body, "")
+
+  # Oracle-specific: Filter to only include execution plan and query details metrics for logs conversion
+  filter/oracle_exec_plan_include:
+    metrics:
+      include:
+        match_type: strict
+        metric_names:
+          - newrelicoracledb.execution_plan
+          - newrelicoracledb.slow_queries.query_details
+
+  # Oracle-specific: Filter to exclude execution plan and query details from main Oracle metrics pipeline
+  filter/oracle_exec_plan_exclude:
+    metrics:
+      exclude:
+        match_type: strict
+        metric_names:
+          - newrelicoracledb.execution_plan
+          - newrelicoracledb.slow_queries.query_details
+
+  # Oracle-specific: Detect system-level resource attributes for Oracle database host
+  resourcedetection/oracle_db_safe:
+    detectors: ["system"]
+    override: false
+    system:
+      hostname_sources: ["os"]
+      resource_attributes:
+        host.id:
+          enabled: true
+
+
+connectors:
+  # Oracle-specific: Convert Oracle execution plan and query metrics to logs for detailed analysis
+  metricsaslogs/oracle:
+    include_resource_attributes: true
+    include_scope_info: true
+
+service:
+  pipelines:
+    # Oracle Metrics Pipeline - processes all Oracle database metrics
+    metrics/oracledb:
+      receivers: [newrelicoracledb/cdb, newrelicoracledb/pdb]
+      processors: [memory_limiter/oracle, cumulativetodelta/oracle, transform/oracle_clear_metadata, filter/oracle_exec_plan_exclude, resourcedetection/oracle_db_safe]
+      exporters: [otlp]
+
+    # Oracle Query Monitoring Pipeline - converts execution plans and query details to logs
+    metrics/oracle_query_to_logs:
+      receivers: [newrelicoracledb/cdb, newrelicoracledb/pdb]
+      processors: [memory_limiter/oracle, filter/oracle_exec_plan_include]
+      exporters: [metricsaslogs/oracle]
+
+    # Oracle Logs Pipeline - processes Oracle execution plans and query details as logs
+    logs/oracledb:
+      receivers: [metricsaslogs/oracle]
+      processors: [memory_limiter/oracle, transform/oracle_clear_metadata, resourcedetection/oracle_db_safe]
+      exporters: [otlp]
+
