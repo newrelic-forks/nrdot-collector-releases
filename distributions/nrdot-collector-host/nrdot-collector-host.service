@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 EnvironmentFile=/etc/nrdot-collector-host/nrdot-collector-host.conf
-ExecStart=/usr/bin/nrdot-collector-host $OTELCOL_OPTIONS
+ExecStart=/bin/sh -c 'exec /usr/bin/nrdot-collector-host $OTELCOL_OPTIONS $(for f in /etc/nrdot-collector-host/*.yaml /etc/nrdot-collector-host/*.yml; do [ -f "$f" ] && echo "--config=$f"; done)'
 KillMode=mixed
 Restart=on-failure
 Type=simple
