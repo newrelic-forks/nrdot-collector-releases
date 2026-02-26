@@ -190,10 +190,11 @@ processors:
     override: true
 
 exporters:
-  otlphttp:
+  otlp:
     endpoint: ${env:OTEL_EXPORTER_OTLP_ENDPOINT:-https://otlp.nr-data.net}
     headers:
       api-key: ${env:NEW_RELIC_LICENSE_KEY}
+    compression: gzip
 
 service:
   pipelines:
@@ -217,22 +218,22 @@ service:
         - resourcedetection/env
         - cumulativetodelta
         - batch
-      exporters: [otlphttp]
+      exporters: [otlp]
     logs/host:
       receivers: [filelog]
       processors: [memory_limiter, transform, resourcedetection, resourcedetection/cloud, resourcedetection/env, batch]
-      exporters: [otlphttp]
+      exporters: [otlp]
     traces:
       receivers: [otlp]
       processors: [memory_limiter, transform, resourcedetection, resourcedetection/cloud, resourcedetection/env, batch]
-      exporters: [otlphttp]
+      exporters: [otlp]
     metrics:
       receivers: [otlp]
       processors: [memory_limiter, transform, resourcedetection, resourcedetection/cloud, resourcedetection/env, batch]
-      exporters: [otlphttp]
+      exporters: [otlp]
     logs:
       receivers: [otlp]
       processors: [memory_limiter, transform, resourcedetection, resourcedetection/cloud, resourcedetection/env, batch]
-      exporters: [otlphttp]
+      exporters: [otlp]
 
   extensions: [health_check]
