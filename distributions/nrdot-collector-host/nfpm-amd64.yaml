@@ -1,0 +1,28 @@
+name: "nrdot-collector-host"
+arch: "amd64"
+platform: "linux"
+version: "1.11.0"
+section: "default"
+priority: "extra"
+maintainer: "New Relic <otelcomm-team@newrelic.com>"
+description: "NRDOT Collector - nrdot-collector-host (with Oracle and SQL Server support via CGO)"
+vendor: "New Relic"
+homepage: "https://github.com/newrelic/nrdot-collector-releases"
+license: "Apache 2.0"
+contents:
+  - src: dist/nrdot-collector-host_linux_amd64_v1/nrdot-collector-host
+    dst: /usr/bin/nrdot-collector-host
+    file_info:
+      mode: 0755
+  - src: config.yaml
+    dst: /etc/nrdot-collector-host/config.yaml
+    type: config
+  - src: nrdot-collector-host.service
+    dst: /lib/systemd/system/nrdot-collector-host.service
+  - src: nrdot-collector-host.conf
+    dst: /etc/nrdot-collector-host/nrdot-collector-host.conf
+    type: config
+scripts:
+  preinstall: preinstall.sh
+  postinstall: postinstall.sh
+  preremove: preremove.sh
