@@ -8,7 +8,7 @@ receivers:
   - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.142.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver v0.142.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/hostmetricsreceiver v0.142.0
-  - gomod: github.com/newrelic/nrdot-collector-components/receiver/oraclereceiver v0.142.0
+  - gomod: github.com/newrelic/nrdot-collector-components/receiver/newrelicoraclereceiver v0.142.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/newrelicsqlserverreceiver v0.142.0
   
 processors:
@@ -48,6 +48,6 @@ replaces:
   # Why: Fixes CVE-2025-68156
   # Transitive dep of various components and packages
   - github.com/expr-lang/expr v1.17.6 => github.com/expr-lang/expr v1.17.7
-  - github.com/newrelic/nrdot-collector-components/receiver/oraclereceiver => github.com/newrelic-forks/nrdot-collector-components/receiver/oraclereceiver 1dc71ebc7ce0b7ad36572138ae0ab70b447787a2
+  - github.com/newrelic/nrdot-collector-components/receiver/newrelicoraclereceiver => github.com/newrelic-forks/nrdot-collector-components/receiver/newrelicoraclereceiver 2bf19dfbc125cabfb93a0ac16788f31283e3928e
   # Replace with custom sqlserver receiver from fork (commit 5e78932d9c176ddaa091189bc373ae6d19c64ff1)
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/newrelicsqlserverreceiver => github.com/newrelic-forks/nrdot-collector-components/receiver/newrelicsqlserverreceiver 5e78932d9c176ddaa091189bc373ae6d19c64ff1
