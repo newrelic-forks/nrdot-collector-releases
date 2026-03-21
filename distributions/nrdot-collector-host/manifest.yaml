@@ -48,6 +48,6 @@ replaces:
   # Transitive dep of various components and packages
   - github.com/expr-lang/expr v1.17.6 => github.com/expr-lang/expr v1.17.7
   # Replace with custom oracle receiver from fork (commit e83cf63304560240cef48b1aa17f5894a8023a56)
-  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/newrelicoraclereceiver => github.com/newrelic-forks/nrdot-collector-components/receiver/newrelicoraclereceiver e83cf63304560240cef48b1aa17f5894a8023a56
+  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/newrelicoraclereceiver => github.com/newrelic-forks/nrdot-collector-components/receiver/newrelicoraclereceiver ac4f83646e3c360d347a5ca593835152ce492e2d
   # Replace with custom sqlserver receiver from fork (commit 5e78932d9c176ddaa091189bc373ae6d19c64ff1)
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/newrelicsqlserverreceiver => github.com/newrelic-forks/nrdot-collector-components/receiver/newrelicsqlserverreceiver 5e78932d9c176ddaa091189bc373ae6d19c64ff1
