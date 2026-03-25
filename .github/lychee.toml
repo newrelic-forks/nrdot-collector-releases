@@ -1,0 +1,36 @@
+include-fragments = true
+
+accept = ["200..=299"]
+require_https = true
+include_fragments = true
+
+exclude  = [
+    # disabled
+    "^https://github.com/newrelic/nrdot-collector-components/discussions",
+    # private org links
+    "^https://www.github.com/newrelic/dbi",
+    "^https://www.github.com/newrelic/ohai",
+    # exclude top-level README image links
+    "https://github.com/newrelic/opensource-website/raw/main/src/images/",
+    # This URL redirects to docs.newrelic.com but repolinter requires the old URL
+    # (see https://raw.githubusercontent.com/newrelic/.github/main/repolinter-rulesets/community-project.yml)
+    "^https://opensource.newrelic.com/oss-category/#community-project",
+]
+
+exclude_path = [
+    "lychee/out.md", # avoid picking up lychee report on reruns
+]
+
+
+#### Avoid rate limiting / timeouts 
+host_concurrency = 1
+host_request_interval = "3s"
+max_redirects = 0
+max_retries = 3
+retry_wait_time = 10
+timeout = 30
+
+#### Caching
+cache = true
+max_cache_age = "7d"
+

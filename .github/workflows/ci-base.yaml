@@ -19,6 +19,8 @@ on:
         type: string
         default: "ci-${{ github.run_id }}-${{ github.run_attempt }}"
     secrets:
+      goreleaser_key:
+        required: true
       gpg_private_key:
         required: true
       gpg_passphrase:
@@ -67,9 +69,9 @@ jobs:
       - run: ./scripts/free-disk-space.sh
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@4b73464bb391d4059bd26b0524d20df3927bd417 # v6.3.0
         with:
-          go-version: "~1.24"
+          go-version: "~1.26"
           cache: ${{ env.caching_enabled }}
           check-latest: true
 
@@ -232,8 +234,9 @@ jobs:
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
           GPG_KEY_PATH: ${{ steps.write_gpg_to_path.outputs.gpg_key_path }}
           REGISTRY: "${{ env.registry }}"
+          GORELEASER_KEY: ${{ secrets.goreleaser_key }}
         with:
-          distribution: goreleaser
+          distribution: goreleaser-pro
           version: "2.11.2"
           args: ${{ env.goreleaser_args }}
           workdir: distributions/${{ inputs.distribution }}
@@ -351,7 +354,7 @@ jobs:
           region: "US"
 
       - name: Trivy security check
-        uses: aquasecurity/trivy-action@0.29.0
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
         with:
           image-ref: "${{ env.registry }}/${{ inputs.distribution}}:${{ env.image_tag }}"
           format: "table"

@@ -1,10 +1,17 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "automerge": false,
+  "dependencyDashboard": false,
   "semanticCommits": "enabled",
   "semanticCommitType": "chore",
   "semanticCommitScope": "deps",
-  "enabledManagers": ["custom.regex"],
+  "enabledManagers": ["custom.regex", "github-actions"],
+  "packageRules": [
+    {
+      "matchManagers": ["github-actions"],
+      "pinDigests": true
+    }
+  ],
   "customManagers": [
     {
       "customType": "regex",
