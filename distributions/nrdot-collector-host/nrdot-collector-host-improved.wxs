@@ -1,0 +1,88 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+  <Product Name='NRDOT Collector Host'
+           Id='*'
+           UpgradeCode='12345678-1234-1234-1234-123456789012'
+           Language='1033'
+           Codepage='1252'
+           Version='1.11.0'
+           Manufacturer='New Relic'>
+
+    <Package Id='*'
+             Keywords='Installer'
+             Description='NRDOT Collector Host with Oracle and SQL Server support (CGO-enabled with MinGW runtime)'
+             Manufacturer='New Relic'
+             InstallerVersion='200'
+             Languages='1033'
+             Compressed='yes'
+             InstallPrivileges='elevated'
+             SummaryCodepage='1252' />
+
+    <Media Id='1' Cabinet='nrdot.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
+    <Property Id='DiskPrompt' Value='NRDOT Collector Host Installation' />
+
+    <Directory Id='TARGETDIR' Name='SourceDir'>
+      <Directory Id='ProgramFilesFolder' Name='PFiles'>
+        <Directory Id='INSTALLDIR' Name='NRDOT Collector Host'>
+
+          <Component Id='MainExecutable' Guid='12345678-1234-1234-1234-123456789013'>
+            <File Id='nrdotexe'
+                  Name='nrdot-collector-host.exe'
+                  DiskId='1'
+                  Source='binaries/nrdot-collector-host-windows-amd64.exe'
+                  KeyPath='yes' />
+
+            <!-- Service Installation - Manual start by default -->
+            <ServiceInstall Id='ServiceInstaller'
+                           Name='nrdot-collector-host'
+                           DisplayName='NRDOT Collector Host'
+                           Description='New Relic NRDOT Collector with Oracle and SQL Server monitoring'
+                           Type='ownProcess'
+                           Start='demand'
+                           Account='LocalSystem'
+                           ErrorControl='normal'
+                           Arguments='--config "[INSTALLDIR]config.yaml"' />
+
+            <ServiceControl Id='ServiceControl'
+                           Name='nrdot-collector-host'
+                           Start='install'
+                           Stop='both'
+                           Remove='uninstall'
+                           Wait='no' />
+          </Component>
+
+          <Component Id='ConfigFile' Guid='12345678-1234-1234-1234-123456789014'>
+            <File Id='configyaml'
+                  Name='config.yaml'
+                  DiskId='1'
+                  Source='config.yaml'
+                  KeyPath='yes' />
+          </Component>
+
+          <!-- MinGW Runtime DLLs (optional - include if available) -->
+          <Component Id='MinGWDLLs' Guid='12345678-1234-1234-1234-123456789019'>
+            <File Id='libgcc' Name='libgcc_s_seh-1.dll' DiskId='1' Source='binaries/libgcc_s_seh-1.dll' KeyPath='yes' />
+          </Component>
+
+          <Component Id='MinGWDLL2' Guid='12345678-1234-1234-1234-123456789020'>
+            <File Id='libwinpthread' Name='libwinpthread-1.dll' DiskId='1' Source='binaries/libwinpthread-1.dll' KeyPath='yes' />
+          </Component>
+
+          <Component Id='MinGWDLL3' Guid='12345678-1234-1234-1234-123456789021'>
+            <File Id='libstdcpp' Name='libstdc++-6.dll' DiskId='1' Source='binaries/libstdc++-6.dll' KeyPath='yes' />
+          </Component>
+
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <Feature Id='Complete' Level='1' Title='NRDOT Collector Host' Description='Complete installation'>
+      <ComponentRef Id='MainExecutable' />
+      <ComponentRef Id='ConfigFile' />
+      <ComponentRef Id='MinGWDLLs' />
+      <ComponentRef Id='MinGWDLL2' />
+      <ComponentRef Id='MinGWDLL3' />
+    </Feature>
+
+  </Product>
+</Wix>

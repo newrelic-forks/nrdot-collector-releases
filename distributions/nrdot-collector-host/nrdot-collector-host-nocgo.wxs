@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+  <Product Name='NRDOT Collector Host'
+           Id='*'
+           UpgradeCode='12345678-1234-1234-1234-123456789012'
+           Language='1033'
+           Codepage='1252'
+           Version='1.11.1'
+           Manufacturer='New Relic'>
+    <Package Id='*'
+             Keywords='Installer'
+             Description='NRDOT Collector Host (Pure Go - No CGO)'
+             Manufacturer='New Relic'
+             InstallerVersion='200'
+             Languages='1033'
+             Compressed='yes'
+             SummaryCodepage='1252' />
+    <Media Id='1' Cabinet='nrdot.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
+    <Property Id='DiskPrompt' Value='NRDOT Collector Host Installation' />
+    <Directory Id='TARGETDIR' Name='SourceDir'>
+      <Directory Id='ProgramFilesFolder' Name='PFiles'>
+        <Directory Id='INSTALLDIR' Name='NRDOT Collector Host'>
+          <Component Id='MainExecutable' Guid='12345678-1234-1234-1234-123456789013'>
+            <File Id='nrdotexe'
+                  Name='nrdot-collector-host.exe'
+                  DiskId='1'
+                  Source='dist/nrdot-collector-host_windows_amd64_v1/nrdot-collector-host.exe'
+                  KeyPath='yes' />
+            <ServiceInstall Id='ServiceInstaller'
+                           Name='nrdot-collector-host'
+                           DisplayName='NRDOT Collector Host'
+                           Description='New Relic NRDOT Collector'
+                           Type='ownProcess'
+                           Start='auto'
+                           Account='LocalSystem'
+                           ErrorControl='normal'
+                           Arguments='--config "[INSTALLDIR]config.yaml"' />
+            <ServiceControl Id='ServiceControl'
+                           Name='nrdot-collector-host'
+                           Start='install'
+                           Stop='both'
+                           Remove='uninstall' />
+          </Component>
+          <Component Id='ConfigFile' Guid='12345678-1234-1234-1234-123456789014'>
+            <File Id='configyaml'
+                  Name='config.yaml'
+                  DiskId='1'
+                  Source='config.yaml'
+                  KeyPath='yes' />
+          </Component>
+        </Directory>
+      </Directory>
+    </Directory>
+    <Feature Id='Complete' Level='1'>
+      <ComponentRef Id='MainExecutable' />
+      <ComponentRef Id='ConfigFile' />
+    </Feature>
+  </Product>
+</Wix>

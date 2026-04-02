@@ -1,4 +1,7 @@
 #!/bin/bash
+# Copyright New Relic, Inc. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 ################################################################################
 # FROZEN BUILD SOLUTION FOR NRDOT-COLLECTOR-HOST
 # This script creates all packages (deb, rpm, msi) from pre-built binaries

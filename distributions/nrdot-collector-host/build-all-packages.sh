@@ -1,7 +1,10 @@
 #!/bin/bash
+# Copyright New Relic, Inc. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 # Comprehensive build script for nrdot-collector-host
 # Builds Linux (deb/rpm) for amd64 and arm64, and Windows MSI for amd64
-# With CGO support for Oracle and SQL Server receivers
+# CGO_ENABLED=0 (Oracle and SQL Server receivers use pure Go implementations)
 
 set -e
 
@@ -12,7 +15,7 @@ REPO_ROOT="${SCRIPT_DIR}/../.."
 BUILD_DIR="${SCRIPT_DIR}/_build"
 DIST_DIR="${SCRIPT_DIR}/dist"
 OUTPUT_DIR="${SCRIPT_DIR}/packages"
-VERSION="1.11.0"
+VERSION="1.11.1"
 
 echo "======================================"
 echo "NRDOT Collector Host - Full Build"
@@ -37,7 +40,7 @@ echo "Step 1: Generating collector sources"
 echo "======================================"
 
 cd "${REPO_ROOT}"
-make generate-sources MANIFEST="${SCRIPT_DIR}/manifest.yaml"
+make generate-sources DISTRIBUTIONS=nrdot-collector-host
 
 if [ ! -d "${BUILD_DIR}" ] || [ ! -f "${BUILD_DIR}/main.go" ]; then
     echo "ERROR: Failed to generate collector sources"
@@ -59,14 +62,11 @@ docker run --rm \
     -v "${DIST_DIR}:/dist" \
     -w /workspace \
     --platform linux/amd64 \
-    golang:1.24-bookworm \
+    golang:1.25-bookworm \
     bash -c "
         set -e
-        echo 'Installing build dependencies...'
-        apt-get update -qq > /dev/null 2>&1
-        apt-get install -y -qq gcc g++ > /dev/null 2>&1
-        echo 'Building AMD64 binary with CGO and buildmode=pie...'
-        export CGO_ENABLED=1
+        echo 'Building AMD64 binary with buildmode=pie...'
+        export CGO_ENABLED=0
         export GOOS=linux
         export GOARCH=amd64
         go build -trimpath -buildmode=pie -ldflags='-s -w' -o /dist/nrdot-collector-host_linux_amd64_v1/nrdot-collector-host .
@@ -95,18 +95,13 @@ docker run --rm \
     -v "${DIST_DIR}:/dist" \
     -w /workspace \
     --platform linux/amd64 \
-    golang:1.24-bookworm \
+    golang:1.25-bookworm \
     bash -c "
         set -e
-        echo 'Installing cross-compilation toolchain...'
-        apt-get update -qq > /dev/null 2>&1
-        apt-get install -y -qq gcc-aarch64-linux-gnu g++-aarch64-linux-gnu > /dev/null 2>&1
-        echo 'Building ARM64 binary with CGO and buildmode=pie...'
-        export CGO_ENABLED=1
+        echo 'Building ARM64 binary with buildmode=pie...'
+        export CGO_ENABLED=0
         export GOOS=linux
         export GOARCH=arm64
-        export CC=aarch64-linux-gnu-gcc
-        export CXX=aarch64-linux-gnu-g++
         go build -trimpath -buildmode=pie -ldflags='-s -w' -o /dist/nrdot-collector-host_linux_arm64_v8.0/nrdot-collector-host .
         chmod +x /dist/nrdot-collector-host_linux_arm64_v8.0/nrdot-collector-host
         echo 'Binary built successfully'
@@ -133,20 +128,14 @@ docker run --rm \
     -v "${DIST_DIR}:/dist" \
     -w /workspace \
     --platform linux/amd64 \
-    golang:1.24-bookworm \
+    golang:1.25-bookworm \
     bash -c "
         set -e
-        echo 'Installing MinGW cross-compiler...'
-        apt-get update -qq > /dev/null 2>&1
-        apt-get install -y -qq mingw-w64 > /dev/null 2>&1
-        echo 'Building Windows AMD64 binary with CGO and buildmode=pie...'
-        export CGO_ENABLED=1
+        echo 'Building Windows AMD64 binary with buildmode=pie...'
+        export CGO_ENABLED=0
         export GOOS=windows
         export GOARCH=amd64
-        export CC=x86_64-w64-mingw32-gcc
-        export CXX=x86_64-w64-mingw32-g++
         go build -trimpath -buildmode=pie -ldflags='-s -w' -o /dist/nrdot-collector-host_windows_amd64_v1/nrdot-collector-host.exe .
-        chmod +x /dist/nrdot-collector-host_windows_amd64_v1/nrdot-collector-host.exe
         echo 'Binary built successfully'
     "
 
@@ -184,7 +173,7 @@ docker run --rm \
     --packager rpm \
     --target /workspace/packages
 
-if [ -f "${OUTPUT_DIR}/nrdot-collector-host_${VERSION}_amd64.deb" ] && [ -f "${OUTPUT_DIR}/nrdot-collector-host-${VERSION}.x86_64.rpm" ]; then
+if [ -f "${OUTPUT_DIR}/nrdot-collector-host_${VERSION}_amd64.deb" ] && [ -f "${OUTPUT_DIR}/nrdot-collector-host-${VERSION}-1.x86_64.rpm" ]; then
     echo "✅ Linux AMD64 packages created"
 else
     echo "❌ Failed to create Linux AMD64 packages"
@@ -217,7 +206,7 @@ docker run --rm \
     --packager rpm \
     --target /workspace/packages
 
-if [ -f "${OUTPUT_DIR}/nrdot-collector-host_${VERSION}_arm64.deb" ] && [ -f "${OUTPUT_DIR}/nrdot-collector-host-${VERSION}.aarch64.rpm" ]; then
+if [ -f "${OUTPUT_DIR}/nrdot-collector-host_${VERSION}_arm64.deb" ] && [ -f "${OUTPUT_DIR}/nrdot-collector-host-${VERSION}-1.aarch64.rpm" ]; then
     echo "✅ Linux ARM64 packages created"
 else
     echo "❌ Failed to create Linux ARM64 packages"
@@ -230,21 +219,90 @@ echo "======================================"
 echo "Step 7: Building Windows MSI"
 echo "======================================"
 
-# Check if WiX is available
-if ! command -v candle &> /dev/null || ! command -v light &> /dev/null; then
-    echo "⚠️  WiX Toolset not found. Skipping MSI build."
-    echo "   To build MSI, install WiX Toolset and run build-msi-improved.sh separately"
-else
-    if [ -f "${SCRIPT_DIR}/build-msi-improved.sh" ]; then
-        bash "${SCRIPT_DIR}/build-msi-improved.sh"
+WINDOWS_EXE="${DIST_DIR}/nrdot-collector-host_windows_amd64_v1/nrdot-collector-host.exe"
+MSI_OUTPUT="${OUTPUT_DIR}/nrdot-collector-host_${VERSION}_windows_amd64.msi"
 
-        if [ -f "${SCRIPT_DIR}"/*.msi ]; then
-            mv "${SCRIPT_DIR}"/*.msi "${OUTPUT_DIR}/"
-            echo "✅ Windows MSI created"
-        fi
-    else
-        echo "⚠️  build-msi-improved.sh not found. Skipping MSI build."
-    fi
+if [ ! -f "${WINDOWS_EXE}" ]; then
+    echo "❌ Windows binary not found, skipping MSI build"
+else
+    # Generate a WiX XML referencing the built binary
+    cat > "${SCRIPT_DIR}/nrdot-collector-host-build.wxs" <<WIXEOF
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+  <Product Name='NRDOT Collector Host'
+           Id='*'
+           UpgradeCode='12345678-1234-1234-1234-123456789012'
+           Language='1033'
+           Codepage='1252'
+           Version='${VERSION}'
+           Manufacturer='New Relic'>
+    <Package Id='*'
+             Keywords='Installer'
+             Description='NRDOT Collector Host'
+             Manufacturer='New Relic'
+             InstallerVersion='200'
+             Languages='1033'
+             Compressed='yes'
+             SummaryCodepage='1252' />
+    <Media Id='1' Cabinet='nrdot.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
+    <Property Id='DiskPrompt' Value='NRDOT Collector Host Installation' />
+    <Directory Id='TARGETDIR' Name='SourceDir'>
+      <Directory Id='ProgramFilesFolder' Name='PFiles'>
+        <Directory Id='INSTALLDIR' Name='NRDOT Collector Host'>
+          <Component Id='MainExecutable' Guid='12345678-1234-1234-1234-123456789013'>
+            <File Id='nrdotexe'
+                  Name='nrdot-collector-host.exe'
+                  DiskId='1'
+                  Source='dist/nrdot-collector-host_windows_amd64_v1/nrdot-collector-host.exe'
+                  KeyPath='yes' />
+            <ServiceInstall Id='ServiceInstaller'
+                           Name='nrdot-collector-host'
+                           DisplayName='NRDOT Collector Host'
+                           Description='New Relic NRDOT Collector'
+                           Type='ownProcess'
+                           Start='auto'
+                           Account='LocalSystem'
+                           ErrorControl='normal'
+                           Arguments='--config "[INSTALLDIR]config.yaml"' />
+            <ServiceControl Id='ServiceControl'
+                           Name='nrdot-collector-host'
+                           Start='install'
+                           Stop='both'
+                           Remove='uninstall' />
+          </Component>
+          <Component Id='ConfigFile' Guid='12345678-1234-1234-1234-123456789014'>
+            <File Id='configyaml'
+                  Name='config.yaml'
+                  DiskId='1'
+                  Source='config.yaml'
+                  KeyPath='yes' />
+          </Component>
+        </Directory>
+      </Directory>
+    </Directory>
+    <Feature Id='Complete' Level='1'>
+      <ComponentRef Id='MainExecutable' />
+      <ComponentRef Id='ConfigFile' />
+    </Feature>
+  </Product>
+</Wix>
+WIXEOF
+
+    echo "Building MSI via Docker with wixl..."
+    docker run --rm \
+        -v "${SCRIPT_DIR}:/workspace" \
+        -w /workspace \
+        --platform linux/amd64 \
+        ubuntu:22.04 \
+        bash -c "
+            set -e
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update -qq && apt-get install -y -qq msitools > /dev/null 2>&1
+            wixl -o packages/nrdot-collector-host_${VERSION}_windows_amd64.msi nrdot-collector-host-build.wxs
+        " && echo "✅ Windows MSI created: nrdot-collector-host_${VERSION}_windows_amd64.msi" \
+          || echo "⚠️  MSI creation failed — binary is available at ${WINDOWS_EXE}"
+
+    rm -f "${SCRIPT_DIR}/nrdot-collector-host-build.wxs"
 fi
 
 # Step 8: Create checksums

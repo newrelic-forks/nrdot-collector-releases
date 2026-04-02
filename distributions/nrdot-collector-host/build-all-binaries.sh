@@ -1,6 +1,10 @@
 #!/bin/bash
-# Build all binaries for nrdot-collector-host with Oracle/SQL Server support
+# Copyright New Relic, Inc. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+# Build all binaries for nrdot-collector-host
 # This script builds Linux AMD64, Linux ARM64, and Windows AMD64
+# CGO_ENABLED=0 (Oracle and SQL Server receivers use pure Go implementations)
 
 set -e
 
@@ -27,20 +31,20 @@ fi
 # Build Linux AMD64 using Docker
 echo ""
 echo "======================================"
-echo "Building Linux AMD64 (with CGO for Oracle/SQL Server)"
+echo "Building Linux AMD64"
 echo "======================================"
 
 docker run --rm \
     -v "${BUILD_DIR}:/workspace" \
     -w /workspace \
     --platform linux/amd64 \
-    golang:1.24-bookworm \
+    golang:1.25-bookworm \
     bash -c "
         set -e
-        export CGO_ENABLED=1
+        export CGO_ENABLED=0
         export GOOS=linux
         export GOARCH=amd64
-        go build -trimpath -ldflags='-s -w' -o nrdot-collector-host-linux-amd64 .
+        go build -trimpath -buildmode=pie -ldflags='-s -w' -o nrdot-collector-host-linux-amd64 .
         chmod +x nrdot-collector-host-linux-amd64
     "
 
@@ -56,23 +60,20 @@ fi
 # Build Linux ARM64 using Docker with cross-compilation
 echo ""
 echo "======================================"
-echo "Building Linux ARM64 (with CGO for Oracle/SQL Server)"
+echo "Building Linux ARM64"
 echo "======================================"
 
 docker run --rm \
     -v "${BUILD_DIR}:/workspace" \
     -w /workspace \
     --platform linux/amd64 \
-    golang:1.24-bookworm \
+    golang:1.25-bookworm \
     bash -c "
         set -e
-        apt-get update -qq && apt-get install -y -qq gcc-aarch64-linux-gnu g++-aarch64-linux-gnu > /dev/null 2>&1
-        export CGO_ENABLED=1
+        export CGO_ENABLED=0
         export GOOS=linux
         export GOARCH=arm64
-        export CC=aarch64-linux-gnu-gcc
-        export CXX=aarch64-linux-gnu-g++
-        go build -trimpath -ldflags='-s -w' -o nrdot-collector-host-linux-arm64 .
+        go build -trimpath -buildmode=pie -ldflags='-s -w' -o nrdot-collector-host-linux-arm64 .
         chmod +x nrdot-collector-host-linux-arm64
     "
 
@@ -85,27 +86,23 @@ else
     exit 1
 fi
 
-# Build Windows AMD64 using Docker with MinGW cross-compiler
+# Build Windows AMD64 using Docker
 echo ""
 echo "======================================"
-echo "Building Windows AMD64 (with CGO for SQL Server)"
+echo "Building Windows AMD64"
 echo "======================================"
 
 docker run --rm \
     -v "${BUILD_DIR}:/workspace" \
     -w /workspace \
     --platform linux/amd64 \
-    golang:1.24-bookworm \
+    golang:1.25-bookworm \
     bash -c "
         set -e
-        apt-get update -qq && apt-get install -y -qq mingw-w64 > /dev/null 2>&1
-        export CGO_ENABLED=1
+        export CGO_ENABLED=0
         export GOOS=windows
         export GOARCH=amd64
-        export CC=x86_64-w64-mingw32-gcc
-        export CXX=x86_64-w64-mingw32-g++
-        go build -trimpath -ldflags='-s -w' -o nrdot-collector-host-windows-amd64.exe .
-        chmod +x nrdot-collector-host-windows-amd64.exe
+        go build -trimpath -buildmode=pie -ldflags='-s -w' -o nrdot-collector-host-windows-amd64.exe .
     "
 
 if [ -f "${BUILD_DIR}/nrdot-collector-host-windows-amd64.exe" ]; then
